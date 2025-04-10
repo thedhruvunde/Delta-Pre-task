@@ -26,6 +26,7 @@ create_user() {
         echo "User $username already exists!"
     else
         useradd -m -d "$home_dir" -g "$group_name" "$username"
+        usermod -a -G $group_name $username
         echo "User $username created!"
     fi
 }
@@ -36,6 +37,7 @@ get_usernames() {
     grep -A 1000 "^$role:" "$CONFIG_FILE" | \
         awk '/^ *- name:/ { getline; print $2 }' | \
         sed '/^[a-zA-Z0-9_]*$/!d'
+        
 }
 
 
