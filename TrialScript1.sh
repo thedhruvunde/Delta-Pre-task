@@ -41,9 +41,12 @@ create_user() {
 
 get_usernames() {
     local role=$1
-    grep -A 1000 "^$role:" "$CONFIG_FILE" | \
-        awk '/^ *- name:/ { getline; print $2 }' | \
-        sed '/^[a-zA-Z0-9_]*$/!d'
+    awk -v role="$role" '
+	$0 ~ "^" role ":" { in_role=1; next }
+  	/^[a-z]+:/ { in_role=0 }
+  	in_role && $1 ~ /username:/ {
+    print $2}
+	' "$CONFIG_FILE"
 }
 
 
