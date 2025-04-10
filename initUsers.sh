@@ -13,7 +13,7 @@ CONFIG_FILE="/scripts/sysad-1-users.yaml"
 createUser() {
 	 username=$1
 	 baseDir=$2
-	 userHome="${baseDir}/${username}"
+	 userHome=${baseDir}/${username}
 
 
 	 if id "$username" &>/dev/null; then	
@@ -21,7 +21,7 @@ createUser() {
 	 	
 	 	
 	 else 
-	 	useradd -m -d "$userHome" "$username"
+	 	useradd -m -d $userHome $username
 	 	echo "Created user: $username group: $group with home: $userHome"
 	 
 	 fi
