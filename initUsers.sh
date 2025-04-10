@@ -46,11 +46,11 @@ parseUsers(){
 		  ' "$CONFIG_FILE")
 
 
-	if "$group" == "g_author"; then
-		for dir in "${subDirs[@]}"; do
-			mkdir -p "/home/authors/$username/&dir"
-		done
-	fi
+	if [ "$group" = "g_author" ]; then
+    	for dir in "${subDirs[@]}"; do
+    		mkdir -p "/home/authors/$username/$dir"
+    	done
+    fi
 	
 	
     	for user in $usernames; do
