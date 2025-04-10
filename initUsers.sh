@@ -31,6 +31,7 @@ createUser() {
 
 
 
+subDirs=("blogs" "public")
 parseUsers(){
 										
 	role=$1
@@ -45,7 +46,13 @@ parseUsers(){
 		  ' "$CONFIG_FILE")
 
 
-
+	if "$group" == "g_author"; then
+		for dir in "${subDirs[@]}"; do
+			mkdir -p "/home/authors/$username/&dir"
+		done
+	fi
+	
+	
     	for user in $usernames; do
         	createUser "$user" "$group" "$baseDir"
         	usermod -a -G $group $user
@@ -53,8 +60,7 @@ parseUsers(){
 }
 
 
-
 parseUsers "admins" "g_admin" "/home/admin"
-parseUsers "authors" "g_author" "/home/authors"
 parseUsers "users" "g_user" "/home/users"
+parseUsers "authors" "g_author" "/home/authors"
 parseUsers "mods" "g_mod" "/home/mods"
