@@ -65,6 +65,8 @@ author_dirs=("blogs" "public")
 get_usernames "authors" | while read -r username; do
     for dir in "${author_dirs[@]"; do
 		mkdir -p "/home/$username/$dir"
+    done 
+done
 
 
 echo "Processing Moderators..."
