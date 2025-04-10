@@ -43,7 +43,7 @@ get_usernames() {
 }
 
 echo "Processing Admins..."
-get_usernames "admin" | while read -r username; do
+get_usernames "admins" | while read -r username; do
     home="/home/admin/$username"
     create_user "$username" "$home" "g_admin"
 done
