@@ -63,8 +63,8 @@ done
 
 author_dirs=("blogs" "public")
 get_usernames "authors" | while read -r username; do
-    for dir in "${author_dirs[@]"; do
-		mkdir -p "/home/$username/$dir"
+    for dir in "${author_dirs[@]}"; do
+		mkdir -p "/home/authors/$username/$dir"
     done 
 done
 
