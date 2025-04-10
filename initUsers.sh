@@ -13,7 +13,6 @@ for dir in "${home_dirs[@]}"; do
     echo "$dir directory created"
 done
 
-
 CONFIG_FILE="/scripts/users.yaml"
 
 
@@ -62,9 +61,15 @@ get_usernames "authors" | while read -r username; do
     create_user "$username" "$home" "g_author"
 done
 
+author_dirs=("blogs" "public")
+get_usernames "authors" | while read -r username; do
+    for dir in "${author_dirs[@]"; do
+		mkdir -p "/home/$username/$dir"
+
 
 echo "Processing Moderators..."
 get_usernames "mods" | while read -r username; do
     home="/home/mods/$username"
     create_user "$username" "$home" "g_mod"
 done
+
