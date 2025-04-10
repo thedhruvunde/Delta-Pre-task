@@ -12,7 +12,7 @@ CONFIG_FILE="/scripts/sysad-1-users.yaml"
 
 createUser() {
 	 username=$1
-	 baseDir=$3
+	 baseDir=$2
 	 userHome="${baseDir}/${username}"
 
 
@@ -50,8 +50,11 @@ parseUsers(){
         	usermod -a -G $group $user
             if [ "$group" = "g_author" ]; then
     	        for dir in "${subDirs[@]}"; do
-    		        mkdir -p "/home/authors/$username/$dir"
+    		        mkdir -p "/home/authors/$user/$dir"
+                      echo "Author $user directories created" 
     	        done
+             else
+                 echo "Normal User"
             fi
     	done
 }
