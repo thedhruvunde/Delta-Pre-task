@@ -14,6 +14,7 @@ createUser() {
 	 username=$1
 	 userHome=$2
 	 group=$3
+     role=$4
 
 
 	 if id "$username" &>/dev/null; then	
@@ -21,7 +22,8 @@ createUser() {
 		 	
     else 
 	 	useradd -m -d $userHome $username
-	 	usermod -a -G $group $username
+	 	mdir -p "/home/$role/$username"
+        usermod -a -G $group $username
 	 	echo "Created user: $username group: $group with home: $userHome" 
 	 fi
 
@@ -45,19 +47,19 @@ parseUsers(){
 
 parseUsers "admins" | while read -r user; do
 	HomeDir=/home/admin/$user
-	createUser "$user" "$HomeDir" "g_admin"
+	createUser "$user" "$HomeDir" "g_admin" "admin"
 done
 
 
 parseUsers "users" | while read -r user; do
 	HomeDir=/home/users/$user
-	createUser "$user" "$HomeDir" "g_user"
+	createUser "$user" "$HomeDir" "g_user" "users"
 done
 
 
 parseUsers "authors" | while read -r user; do
 	HomeDir=/home/authors/$user
-	createUser "$user" "$HomeDir" "g_author"
+	createUser "$user" "$HomeDir" "g_author" "author"
 	
 	subDirs=("blogs" "public")
 	for dir in "${subDirs[@]}"; do
@@ -70,7 +72,7 @@ done
 
 parseUsers "mods" | while read -r user; do
 	HomeDir=/home/mods/$user
-	createUser "$user" "$HomeDir" "g_mod"
+	createUser "$user" "$HomeDir" "g_mod" "mods"
 done
 
 
