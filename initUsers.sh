@@ -35,12 +35,12 @@ parseUsers(){
 										
 	role=$1
 	
-	usernames=$(awk -v role="$role" '
-		  $0 ~ "^" role ":" { in_role=1; next }
-  		  /^[a-z]+:/ { in_role=0 }
-  		  in_role && $1 ~ /username:/ {
-    		  print $2}
-		  ' "$CONFIG_FILE")
+	awk -v role="$role" '
+	$0 ~ "^" role ":" { in_role=1; next }
+  	/^[a-z]+:/ { in_role=0 }
+  	in_role && $1 ~ /username:/ {
+    print $2}
+	' "$CONFIG_FILE")
 	
            
 }
