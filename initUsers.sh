@@ -40,7 +40,7 @@ parseUsers(){
   	/^[a-z]+:/ { in_role=0 }
   	in_role && $1 ~ /username:/ {
     print $2}
-	' "$CONFIG_FILE")
+	' "$CONFIG_FILE"
 	
            
 }
