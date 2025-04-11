@@ -44,21 +44,20 @@ parseUsers(){
 
 
 parseUsers "admins" | while read -r user; do
-	HomeDir="/home/admin/$user"
+	HomeDir=/home/admin/$user
 	createUser "$user" "HomeDir" "g_admin"
 done
 
 
 parseUsers "users" | while read -r user; do
-	HomeDir="/home/users/$user"
+	HomeDir=/home/users/$user
 	createUser "$user" "HomeDir" "g_user"
 done
 
 
 parseUsers "authors" | while read -r user; do
-	HomeDir="/home/authors/$user"
+	HomeDir=/home/authors/$user
 	createUser "$user" "HomeDir" "g_author"
-	
 	
 	subDirs=("blogs" "public")
 	for dir in "${subDirs[@]}"; do
@@ -70,7 +69,7 @@ done
 
 
 parseUsers "mods" | while read -r user; do
-	HomeDir="/home/mods/$user"
+	HomeDir=/home/mods/$user
 	createUser "$user" "HomeDir" "g_mod"
 done
 
