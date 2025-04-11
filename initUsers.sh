@@ -18,13 +18,11 @@ createUser() {
 
 	 if id "$username" &>/dev/null; then	
 	 	echo "User $username already exists."
-	 	
-	 	
-	 else 
+		 	
+    else 
 	 	useradd -m -d $userHome $username
 	 	usermod -a -G $group $username
-	 	echo "Created user: $username group: $group with home: $userHome"
-	 
+	 	echo "Created user: $username group: $group with home: $userHome" 
 	 fi
 
 }
@@ -39,8 +37,7 @@ parseUsers(){
 	$0 ~ "^" role ":" { in_role=1; next }
   	/^[a-z]+:/ { in_role=0 }
   	in_role && $1 ~ /username:/ {
-    print $2}
-	' "$CONFIG_FILE"
+    print $2} ' "$CONFIG_FILE"
 	
            
 }
