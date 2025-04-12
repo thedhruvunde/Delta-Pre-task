@@ -99,7 +99,7 @@ get_usernames "mods" | while read -r modid; do
     home="/home/mods/$modid"
     chmod 700 $home
     get_authors $modid | while read -r authorid; do
-    usermod -a -G $authorid $modid
-    
+        usermod -a -G $authorid $modid
+    done 
 done
 
