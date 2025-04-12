@@ -120,10 +120,10 @@ parseMods() {
 
 
 echo "Configuring mods permissions..."
-parseUsers "mods" | while read -r user; do
+parseUsers "mods" | while read -r mod; do
     chmod 700 /home/mods/$user
-    parseMods "mods" "user" | while read -r authorname; do
-    usermod -aG $authorname $user
+    parseMods "mod" | while read -r authorname; do
+        usermod -aG $authorname $user
 done
 done
 
