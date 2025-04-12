@@ -109,5 +109,6 @@ parseUsers "mods" | while read -r user; do
     parseMods "mods" "user" | while read -r authorname; do
     usermod -aG authorname user
 done
+done
 
 
