@@ -89,5 +89,24 @@ done
 echo "Configuring mods permissions..."
 parseUsers "mods" | while read -r user; do
     chmod 700 /home/mods/$user
+    parseMods "mods" "user" | while read -r authorname; do
+    usermod -aG authorname user
 done
 
+
+parseMods(){
+										
+	role=$1
+    mod=$2
+	
+	awk -v role="$role" '
+	$0 ~ "^" role ":" { in_role=1; next }
+  	/^[a-z]+:/ { in_role=0 }
+    $0 ~ "^" "- name" ":" { in_user=1; next }
+  	/^-+[name]+[a-z]+:/ { in_user=0 }
+  	in_role && $1 ~ /username:/{next}
+    in_user && $2 ~ /authors:/{next}
+    {
+    print $1} ' "$CONFIG_FILE"
+	   
+}
