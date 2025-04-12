@@ -43,19 +43,19 @@ parseUsers(){
            
 }
 
-
+echo "Processing admins..."
 parseUsers "admins" | while read -r user; do
 	HomeDir=/home/admin/$user
 	createUser "$user" "$HomeDir" "g_admin" "admin"
 done
 
-
+echo "Processing users..."
 parseUsers "users" | while read -r user; do
 	HomeDir=/home/users/$user
 	createUser "$user" "$HomeDir" "g_user" "users"
 done
 
-
+echo "Processing authors..."
 parseUsers "authors" | while read -r user; do
 	HomeDir=/home/authors/$user
 	createUser "$user" "$HomeDir" "g_author" "author"
@@ -68,10 +68,26 @@ parseUsers "authors" | while read -r user; do
 done
 
 
-
+echo "Processing mods..."
 parseUsers "mods" | while read -r user; do
 	HomeDir=/home/mods/$user
 	createUser "$user" "$HomeDir" "g_mod" "mods"
 done
 
+
+echo "Configuring user permissions..."
+parseUsers "users" | while read -r user; do
+    chmod 700 /home/users/$user
+done
+
+echo "Configuring admin permissions..."
+parseUsers "admins" | while read -r user; do
+    chmod 700 /home/admins/$user
+    usermod -a -G sudo $user
+done
+
+echo "Configuring mods permissions..."
+parseUsers "mods" | while read -r user; do
+    chmod 700 /home/mods/$user
+done
 
