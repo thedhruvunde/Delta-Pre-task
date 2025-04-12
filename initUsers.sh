@@ -82,15 +82,8 @@ done
 
 echo "Configuring admin permissions..."
 parseUsers "admins" | while read -r user; do
-    chmod 700 /home/admins/$user
+    chmod 700 /home/admin/$user
     usermod -a -G sudo $user
-done
-
-echo "Configuring mods permissions..."
-parseUsers "mods" | while read -r user; do
-    chmod 700 /home/mods/$user
-    parseMods "mods" "user" | while read -r authorname; do
-    usermod -aG authorname user
 done
 
 
@@ -106,7 +99,15 @@ parseMods(){
   	/^-+[name]+[a-z]+:/ { in_user=0 }
   	in_role && $1 ~ /username:/{next}
     in_user && $2 ~ /authors:/{next}
-    {
-    print $1} ' "$CONFIG_FILE"
+    {print $1} ' "$CONFIG_FILE"
 	   
 }
+
+echo "Configuring mods permissions..."
+parseUsers "mods" | while read -r user; do
+    chmod 700 /home/mods/$user
+    parseMods "mods" "user" | while read -r authorname; do
+    usermod -aG authorname user
+done
+
+
