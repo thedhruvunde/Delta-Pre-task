@@ -6,8 +6,7 @@ addgroup g_mod
 addgroup g_admin
 addgroup g_author
 
-sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq
-sudo chmod +x /usr/local/bin/yq
+pip3 install yq
 
 home_dirs=("admin" "users" "mods" "authors")
 for dir in "${home_dirs[@]}"; do
