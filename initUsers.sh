@@ -6,8 +6,8 @@ addgroup g_mod
 addgroup g_admin
 addgroup g_author
 
-sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq
-sudo chmod +x /usr/local/bin/yq
+apt update && apt install python3 python3-pip -y
+pip3 install pyyaml
 
 home_dirs=("admin" "users" "mods" "authors")
 for dir in "${home_dirs[@]}"; do
@@ -45,7 +45,7 @@ get_usernames() {
 
 
 get_authors() {
-    yq '.mods[] | select(.username == "'"$1"'") | .authors[]' users.yaml
+    python3 get_authors.py
 }
 echo "Processing Admins..."
 get_usernames "admins" | while read -r username; do
