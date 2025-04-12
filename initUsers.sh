@@ -22,7 +22,6 @@ createUser() {
 		 	
     else 
 	 	useradd -m -d $userHome $username
-	 	mdir -p "/home/$role/$username"
         usermod -a -G $group $username
 	 	echo "Created user: $username group: $group with home: $userHome" 
 	 fi
