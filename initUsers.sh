@@ -6,6 +6,7 @@ addgroup g_mod
 addgroup g_admin
 addgroup g_author
 
+apt install yq -y
 
 home_dirs=("admin" "users" "mods" "authors")
 for dir in "${home_dirs[@]}"; do
@@ -30,7 +31,6 @@ create_user() {
     fi
 }
 
-
 get_usernames() {
     local role=$1
     awk -v role="$role" '
@@ -42,6 +42,10 @@ get_usernames() {
         
 }
 
+
+get_authors() {
+    yq '.mods[] | select(.username == "'"$1"'") | .authors[]' users.yaml
+}
 echo "Processing Admins..."
 get_usernames "admins" | while read -r username; do
     home="/home/admin/$username"
@@ -73,5 +77,28 @@ echo "Processing Moderators..."
 get_usernames "mods" | while read -r username; do
     home="/home/mods/$username"
     create_user "$username" "$home" "g_mod"
+done
+
+echo "Processing User permissions..."
+get_usernames "users" | while read -r username; do
+    home="/home/users/$username"
+    chmod 700 $home
+    
+done
+
+echo "Processing admin permissions..."
+get_usernames "admins" | while read -r username; do
+    home="/home/admin/$username"
+    chmod 700 $home
+    usermod -a -G sudo
+done
+
+echo "Processing Moderators permissions..."
+get_usernames "mods" | while read -r modid; do
+    home="/home/mods/$modid"
+    chmod 700 $home
+    get_authors $modid | while read -r authorid; do
+    usermod -a -G $authorid $modid
+    
 done
 
