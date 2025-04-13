@@ -6,7 +6,7 @@ addgroup g_mod
 addgroup g_admin
 addgroup g_author
 apt update && apt install wget -y
-wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq
+wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_arm64 -O /usr/local/bin/yq
 chmod +x /usr/local/bin/yq
 
 home_dirs=("admin" "users" "mods" "authors")
