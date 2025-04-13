@@ -1,5 +1,8 @@
 #!/bin/bash
 
+apt update && apt install wget -y
+wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq
+chmod +x /usr/local/bin/yq
 
 
 addgroup g_user
@@ -87,43 +90,32 @@ parseUsers "admins" | while read -r user; do
 done
 
 
-parseMods() {
-    mod_username=$1
-
-    awk -v target="$mod_username" '
-    $0 ~ /mods:/ { in_mods = 1; next }
-    in_mods && /^[a-z]+:/ { in_mods = 0 }  # exit mods section
-
-    in_mods && $0 ~ /username:[[:space:]]*"'$mod_username'"[[:space:]]*$/ {
-        in_target = 1
-        next
-    }
-
-    in_target && $0 ~ /authors:/ {
-        in_authors = 1
-        next
-    }
-
-    in_authors && $1 ~ /^-$/ {
-        gsub("-", "", $1)
-        gsub(/[[:space:]]*/, "", $0)
-        print $0
-        next
-    }
-
-    in_authors && $0 !~ /^- / {
-        in_authors = 0
-        in_target = 0
-    }
-    ' "$CONFIG_FILE"
+parseMods(){
+										
+	role=$1
+    mod=$2
+	
+	awk -v role="$role" '
+	$0 ~ "^" role ":" { in_role=1; next }
+  	/^[a-z]+:/ { in_role=0 }
+    $0 ~ "^" "- name" ":" { in_user=1; next }
+  	/^-+[name]+[a-z]+:/ { in_user=0 }
+  	in_role && $1 ~ /username:/{next}
+    in_user && $2 ~ /authors:/{next}
+    {print $1} ' "$CONFIG_FILE"
+	   
 }
 
-
+parseMods() {
+    yq '.mods[] | select(.username == "'"$1"'") | .authors[]' CONFIG_FILE
+}
 echo "Configuring mods permissions..."
-parseUsers "mods" | while read -r mod; do
+parseUsers "mods" | while read -r moderator; do
     chmod 700 /home/mods/$user
-    parseMods "mod" | while read -r authorname; do
-        usermod -aG $authorname $user
-done
+    parseMods $moderator | while read -r authorname; do
+        usermod -a -G $authorname $moderator
+        chown $authorname:$authorname "/home/authors/$authorname/public"
+        chmod 770 "/home/authors/$authorname"
+    done
 done
 
