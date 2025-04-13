@@ -122,3 +122,60 @@ parseUsers "users" | while read -r user; do
     chmod -R 500 "$allBlogsDir"/*
     echo "All blog links created for user: $user"
 done
+
+
+
+getExistingUsersInGroup() {
+    getent group "$1" | awk -F: '{print $4}' | tr ',' '\n' | sort | uniq
+}
+
+getYamlUsersByRole() {
+    yq ".${1}[].username" "$CONFIG_FILE" | sort | uniq
+}
+
+syncUsersInGroup() {
+    local role=$1
+    local group=$2
+
+    existingUsers=$(getExistingUsersInGroup "$group")
+    yamlUsers=$(getYamlUsersByRole "$role")
+
+    for user in $existingUsers; do
+        if ! grep -qx "$user" <<< "$yamlUsers"; then
+            echo "Revoking $role access from removed user: $user"
+            gpasswd -d "$user" "$group" 2>/dev/null
+        fi
+    done
+}
+
+syncUsersInGroup "users" "g_user"
+syncUsersInGroup "authors" "g_author"
+syncUsersInGroup "mods" "g_mod"
+syncUsersInGroup "admins" "g_admin"
+
+echo "Updating moderators' author access..."
+
+parseUsers "mods" | while read -r mod; do
+    echo "Resetting author groups for moderator: $mod"
+
+    # Remove mod from all current author groups
+    for author in $(getYamlUsersByRole "authors"); do
+        gpasswd -d "$mod" "$author" 2>/dev/null
+    done
+
+    # Re-add based on YAML
+    yq '.mods[] | select(.username == "'"$mod"'") | .authors[]' "$CONFIG_FILE" | while read -r authorname; do
+        echo "Granting $mod access to $authorname"
+        usermod -a -G "$authorname" "$mod"
+        chown "$authorname:$authorname" "/home/authors/$authorname/public"
+        chmod 770 "/home/authors/$authorname"
+    done
+done
+
+echo "Granting admin users full access to all directories..."
+
+parseUsers "admins" | while read -r admin; do
+    for dir in /home/users/* /home/authors/* /home/mods/*; do
+        [ -d "$dir" ] && setfacl -m u:$admin:rwx "$dir"
+    done
+done
