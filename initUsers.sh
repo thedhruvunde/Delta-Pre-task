@@ -57,6 +57,7 @@ echo "Processing Users..."
 get_usernames "users" | while read -r username; do
     home="/home/users/$username"
     create_user "$username" "$home" "g_user"
+    mkdir -p "/home/users/$username/all_blogs"
 done
 
 
