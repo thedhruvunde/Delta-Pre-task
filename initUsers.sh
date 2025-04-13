@@ -31,17 +31,10 @@ create_user() {
         echo "User $username created!"
     fi
 }
-
 get_usernames() {
-    local role=$1
-    awk -v role="$role" '
-	$0 ~ "^" role ":" { in_role=1; next }
-  	/^[a-z]+:/ { in_role=0 }
-  	in_role && $1 ~ /username:/ {
-    print $2}
-	' "$CONFIG_FILE"
-        
+    yq ".${1}[].username" "$CONFIG_FILE" | sort -u
 }
+
 
 
 get_authors() {
@@ -130,18 +123,12 @@ getExistingUsersInGroup() {
     getent group "$1" | cut -d: -f4 | tr ',' '\n' | sort -u
 }
 
-
-getYamlUsersByRole() {
-    yq ".${1}[].username" "$CONFIG_FILE" | sort -u
-}
-
-
 syncUsersInGroup() {
     role=$1
     group=$2
 
     existingUsers=$(getExistingUsersInGroup "$group")
-    yamlUsers=$(getYamlUsersByRole "$role")
+    yamlUsers=$(get_usernames "$role")
 
     for user in $existingUsers; do
         if ! grep -qx "$user" <<< "$yamlUsers"; then
@@ -166,7 +153,7 @@ get_usernames "mods" | while read -r mod; do
     current_groups=$(id -nG "$mod")
     new_groups=""
     for group in $current_groups; do
-        if ! getYamlUsersByRole "authors" | grep -qx "$group"; then
+        if ! get_usernames "authors" | grep -qx "$group"; then
             new_groups+="$group "
         fi
     done
