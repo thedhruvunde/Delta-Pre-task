@@ -33,17 +33,8 @@ createUser() {
 
 
 
-parseUsers(){
-										
-	role=$1
-	
-	awk -v role="$role" '
-	$0 ~ "^" role ":" { in_role=1; next }
-  	/^[a-z]+:/ { in_role=0 }
-  	in_role && $1 ~ /username:/ {
-    print $2} ' "$CONFIG_FILE"
-	
-           
+parseUsers(){							
+	yq ".${1}[].username" "$CONFIG_FILE" | sort -u         
 }
 
 echo "Processing admins..."
@@ -129,16 +120,12 @@ getExistingUsersInGroup() {
     getent group "$1" | awk -F: '{print $4}' | tr ',' '\n' | sort | uniq
 }
 
-getYamlUsersByRole() {
-    yq ".${1}[].username" "$CONFIG_FILE" | sort | uniq
-}
-
 syncUsersInGroup() {
     local role=$1
     local group=$2
 
     existingUsers=$(getExistingUsersInGroup "$group")
-    yamlUsers=$(getYamlUsersByRole "$role")
+    yamlUsers=$(parseUsers "$role")
 
     for user in $existingUsers; do
         if ! grep -qx "$user" <<< "$yamlUsers"; then
@@ -157,13 +144,11 @@ echo "Updating moderators' author access..."
 
 parseUsers "mods" | while read -r mod; do
     echo "Resetting author groups for moderator: $mod"
-
-    # Remove mod from all current author groups
-    for author in $(getYamlUsersByRole "authors"); do
+    
+    for author in $(parseUsers "authors"); do
         gpasswd -d "$mod" "$author" 2>/dev/null
     done
 
-    # Re-add based on YAML
     yq '.mods[] | select(.username == "'"$mod"'") | .authors[]' "$CONFIG_FILE" | while read -r authorname; do
         echo "Granting $mod access to $authorname"
         usermod -a -G "$authorname" "$mod"
