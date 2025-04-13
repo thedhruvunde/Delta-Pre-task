@@ -113,9 +113,9 @@ echo "Configuring mods permissions..."
 parseUsers "mods" | while read -r moderator; do
     chmod 700 /home/mods/$user
     parseMods $moderator | while read -r authorname; do
-        usermod -a -G $authorid $modid
-        chown $authorid:$authorid "/home/authors/$authorid"
-        chmod 770 "/home/authors/$authorid"
+        usermod -a -G $authorname $moderator
+        chown $authorname:$authorname "/home/authors/$authorname"
+        chmod 770 "/home/authors/$authorname"
     done
 done
 
