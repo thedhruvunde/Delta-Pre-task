@@ -91,7 +91,7 @@ echo "Processing admin permissions..."
 get_usernames "admins" | while read -r username; do
     home="/home/admin/$username"
     chmod 700 $home
-    usermod -a -G sudo
+    usermod -a -G sudo $username
 done
 
 echo "Processing Moderators permissions..."
