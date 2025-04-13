@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Create groups
+
 addgroup g_user
 addgroup g_mod
 addgroup g_admin
@@ -123,4 +123,58 @@ get_usernames "users" | while read -r user; do
     chmod 500 "$allBlogsDir"
     chmod -R 500 "$allBlogsDir"/*
     echo "All blog links created for user: $user"
+done
+
+
+getExistingUsersInGroup() {
+    getent group "$1" | cut -d: -f4 | tr ',' '\n' | sort -u
+}
+
+
+getYamlUsersByRole() {
+    yq ".${1}[].username" "$CONFIG_FILE" | sort -u
+}
+
+
+syncUsersInGroup() {
+    role=$1
+    group=$2
+
+    existingUsers=$(getExistingUsersInGroup "$group")
+    yamlUsers=$(getYamlUsersByRole "$role")
+
+    for user in $existingUsers; do
+        if ! grep -qx "$user" <<< "$yamlUsers"; then
+            echo "Removing $user from group '$group' (not in '$role')"
+            current_groups=$(id -nG "$user" | tr ' ' '\n' | grep -v "^$group$" | paste -sd, -)
+            sudo usermod -G "$current_groups" "$user"
+        fi
+    done
+}
+
+syncUsersInGroup "users" "g_user"
+syncUsersInGroup "authors" "g_author"
+syncUsersInGroup "mods" "g_mod"
+syncUsersInGroup "admins" "g_admin"
+
+
+echo "Updating moderators' author access..."
+
+
+get_usernames "mods" | while read -r mod; do
+    echo "Resetting author groups for moderator: $mod"
+    current_groups=$(id -nG "$mod")
+    new_groups=""
+    for group in $current_groups; do
+        if ! getYamlUsersByRole "authors" | grep -qx "$group"; then
+            new_groups+="$group "
+        fi
+    done
+    usermod -G "$new_groups" "$mod"
+    yq ".mods[] | select(.username == \"$mod\") | .authors[]" "$CONFIG_FILE" | while read -r authorname; do
+        echo "Granting $mod access to $authorname"
+        usermod -a -G "$authorname" "$mod"
+        chown "$authorname:$authorname" "/home/authors/$authorname/public"
+        chmod 770 "/home/authors/$authorname"
+    done
 done
