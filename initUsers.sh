@@ -1,5 +1,8 @@
 #!/bin/bash
 
+apt update && apt install wget -y
+wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq
+chmod +x /usr/local/bin/yq
 
 
 addgroup g_user
@@ -103,12 +106,17 @@ parseMods(){
 	   
 }
 
+parseMods() {
+    yq '.mods[] | select(.username == "'"$1"'") | .authors[]' CONFIG_FILE
+}
 echo "Configuring mods permissions..."
-parseUsers "mods" | while read -r user; do
+parseUsers "mods" | while read -r moderator; do
     chmod 700 /home/mods/$user
-    parseMods "mods" "user" | while read -r authorname; do
-    usermod -aG $authorname $user
-done
+    parseMods $moderator | while read -r authorname; do
+        usermod -a -G $authorid $modid
+        chown $authorid:$authorid "/home/authors/$authorid"
+        chmod 770 "/home/authors/$authorid"
+    done
 done
 
 
