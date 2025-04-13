@@ -90,22 +90,6 @@ parseUsers "admins" | while read -r user; do
 done
 
 
-parseMods(){
-										
-	role=$1
-    mod=$2
-	
-	awk -v role="$role" '
-	$0 ~ "^" role ":" { in_role=1; next }
-  	/^[a-z]+:/ { in_role=0 }
-    $0 ~ "^" "- name" ":" { in_user=1; next }
-  	/^-+[name]+[a-z]+:/ { in_user=0 }
-  	in_role && $1 ~ /username:/{next}
-    in_user && $2 ~ /authors:/{next}
-    {print $1} ' "$CONFIG_FILE"
-	   
-}
-
 parseMods() {
     yq '.mods[] | select(.username == "'"$1"'") | .authors[]' CONFIG_FILE
 }
