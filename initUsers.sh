@@ -105,3 +105,22 @@ get_usernames "mods" | while read -r modid; do
         chmod 770 "/home/authors/$authorid"
     done 
 done
+
+
+echo "Creating all_blogs symlinks for users..."
+authors=$(yq '.authors[].username' "$CONFIG_FILE")
+
+parseUsers "users" | while read -r user; do
+    allBlogsDir="/home/users/$user/all_blogs"
+    mkdir -p "$allBlogsDir"
+
+    for author in $authors; do
+        target="/home/authors/$author/public"
+        linkname="$allBlogsDir/$author"
+        ln -s "$target" "$linkname"
+    done
+
+    chmod 500 "$allBlogsDir"
+    chmod -R 500 "$allBlogsDir"/*
+    echo "All blog links created for user: $user"
+done
