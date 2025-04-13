@@ -100,6 +100,7 @@ get_usernames "mods" | while read -r modid; do
     chmod 700 $home
     get_authors $modid | while read -r authorid; do
         usermod -a -G $authorid $modid
+        chown $authorid:$authorid "/home/authors/$authorid"
+        chmod 770 "/home/authors/$authorid"
     done 
 done
-#TODO-Author Permissions
