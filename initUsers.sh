@@ -110,7 +110,7 @@ done
 echo "Creating all_blogs symlinks for users..."
 authors=$(yq '.authors[].username' "$CONFIG_FILE")
 
-parseUsers "users" | while read -r user; do
+get_usernames "users" | while read -r user; do
     allBlogsDir="/home/users/$user/all_blogs"
     mkdir -p "$allBlogsDir"
 
