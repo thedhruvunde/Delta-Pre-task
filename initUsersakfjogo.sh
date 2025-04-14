@@ -109,6 +109,7 @@ parseUsers "users" | while read -r user; do
         ln -s "$target" "$linkname"
     done
 
+    chown -R "$user:$user" "$allBlogsDir"
     chmod 500 "$allBlogsDir"
     chmod -R 500 "$allBlogsDir"/*
     echo "All blog links created for user: $user"
