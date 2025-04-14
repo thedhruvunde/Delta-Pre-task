@@ -130,7 +130,8 @@ syncUsersInGroup() {
     for user in $existingUsers; do
         if ! grep -qx "$user" <<< "$yamlUsers"; then
             echo "Revoking $role access from removed user: $user"
-            gpasswd -d "$user" "$group" 2>/dev/null
+            current_groups=$(id -nG "$user" | tr ' ' '\n' | grep -v "^$group$" | paste -sd, -)
+            sudo usermod -G "$current_groups" "$user"
         fi
     done
 }
@@ -145,10 +146,15 @@ echo "Updating moderators' author access..."
 parseUsers "mods" | while read -r mod; do
     echo "Resetting author groups for moderator: $mod"
     
-    for author in $(parseUsers "authors"); do
-        gpasswd -d "$mod" "$author" 2>/dev/null
+    current_groups=$(id -nG "$mod")
+    new_groups=""
+    for group in $current_groups; do
+        if ! parseUsers "authors" | grep -qx "$group"; then
+            new_groups+="$group "
+        fi
     done
-
+    usermod -G "$new_groups" "$mod"
+    
     yq '.mods[] | select(.username == "'"$mod"'") | .authors[]' "$CONFIG_FILE" | while read -r authorname; do
         echo "Granting $mod access to $authorname"
         usermod -a -G "$authorname" "$mod"
@@ -157,10 +163,3 @@ parseUsers "mods" | while read -r mod; do
     done
 done
 
-echo "Granting admin users full access to all directories..."
-
-parseUsers "admins" | while read -r admin; do
-    for dir in /home/users/* /home/authors/* /home/mods/*; do
-        [ -d "$dir" ] && setfacl -m u:$admin:rwx "$dir"
-    done
-done
