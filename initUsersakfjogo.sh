@@ -11,7 +11,7 @@ addgroup g_mod
 addgroup g_author
 
 
-CONFIG_FILE="/scripts/sysad-1-users.yaml"
+CONFIG_FILE="/scripts/users.yaml"
 
 createUser() {
 	 username=$1
