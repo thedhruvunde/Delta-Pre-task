@@ -118,7 +118,7 @@ done
 
 
 getExistingUsersInGroup() {
-    getent group "$1" | awk -F: '{print $4}' | tr ',' '\n' | sort | uniq
+    getent group "$1" | cut -d: -f4 | tr ',' '\n' | sort -u
 }
 
 syncUsersInGroup() {
