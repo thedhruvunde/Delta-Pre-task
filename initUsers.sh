@@ -64,7 +64,8 @@ author_dirs=("blogs" "public")
 get_usernames "authors" | while read -r username; do
     for dir in "${author_dirs[@]}"; do
 		mkdir -p "/home/authors/$username/$dir"
-    done 
+    done
+    cp "blogs.yaml" "/home/authors/$username/"
 done
 
 
@@ -96,6 +97,8 @@ get_usernames "mods" | while read -r modid; do
         usermod -a -G $authorid $modid
         chown $authorid:$authorid "/home/authors/$authorid"
         chmod 770 "/home/authors/$authorid"
+        mkdir -p "/home/mods/$modid/AuthorDirs/$authorid"
+        ln -s "/home/authors/$authorid" "/home/mods/$modid/AuthorDirs/$authorid"
     done 
 done
 
