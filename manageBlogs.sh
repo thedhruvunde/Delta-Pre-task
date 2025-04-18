@@ -19,8 +19,10 @@ while getopts "p:a:d:e:" opt; do
         ;;
     d)
         d_flag=$OPTARG
+        ;;
     e)
         e_flag=$OPTARG
+        ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
       exit 1
