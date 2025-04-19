@@ -14,20 +14,19 @@ addgroup g_author
 CONFIG_FILE="/scripts/users.yaml"
 
 createUser() {
-	 username=$1
-	 userHome=$2
-	 group=$3
-     role=$4
+	username=$1
+	userHome=$2
+	group=$3
 
 
-	 if id "$username" &>/dev/null; then	
-	 	echo "User $username already exists."
+	if id "$username" &>/dev/null; then	
+	    echo "User $username already exists."
 		 	
     else 
 	 	useradd -m -d $userHome $username
         usermod -a -G $group $username
-	 	echo "Created user: $username group: $group with home: $userHome" 
-	 fi
+	 	echo "Created user: $username in group: $group with home: $userHome" 
+	fi
 
 }
 
@@ -40,24 +39,24 @@ parseUsers(){
 echo "Processing admins..."
 parseUsers "admins" | while read -r user; do
 	HomeDir=/home/admin/$user
-	createUser "$user" "$HomeDir" "g_admin" "admin"
+	createUser "$user" "$HomeDir" "g_admin"
 done
 
 echo "Processing users..."
 parseUsers "users" | while read -r user; do
 	HomeDir=/home/users/$user
-	createUser "$user" "$HomeDir" "g_user" "users"
+	createUser "$user" "$HomeDir" "g_user"
 done
 
 echo "Processing authors..."
 parseUsers "authors" | while read -r user; do
 	HomeDir=/home/authors/$user
-	createUser "$user" "$HomeDir" "g_author" "author"
+	createUser "$user" "$HomeDir" "g_author"
 	
 	subDirs=("blogs" "public")
 	for dir in "${subDirs[@]}"; do
-        	mkdir -p "/home/authors/$user/$dir"
-        	echo "Author $user directories created" 
+        mkdir -p "/home/authors/$user/$dir"
+        echo "Author $user directories created" 
 	done
 done
 
@@ -65,7 +64,7 @@ done
 echo "Processing mods..."
 parseUsers "mods" | while read -r user; do
 	HomeDir=/home/mods/$user
-	createUser "$user" "$HomeDir" "g_mod" "mods"
+	createUser "$user" "$HomeDir" "g_mod"
 done
 
 
@@ -82,7 +81,7 @@ done
 
 
 parseMods() {
-    yq '.mods[] | select(.username == "'"$1"'") | .authors[]' CONFIG_FILE
+    yq '.mods[] | select(.username == "'"$1"'") | .authors[]' "$CONFIG_FILE"
 }
 echo "Configuring mods permissions..."
 parseUsers "mods" | while read -r moderator; do
@@ -91,6 +90,10 @@ parseUsers "mods" | while read -r moderator; do
         usermod -a -G $authorname $moderator
         chown $authorname:$authorname "/home/authors/$authorname/public"
         chmod 770 "/home/authors/$authorname"
+        mkdir -p "/honme/mods/$moderator/Author_publicDir/$authorname"
+        linkname="/home/authors/$authorname/public"
+        destination="/honme/mods/$moderator/Author_publicDir/$authorname"
+        ln -s "$linkname" "$destination"
     done
 done
 
@@ -104,9 +107,9 @@ parseUsers "users" | while read -r user; do
     mkdir -p "$allBlogsDir"
 
     for author in $authors; do
-        target="/home/authors/$author/public"
-        linkname="$allBlogsDir/$author"
-        ln -s "$target" "$linkname"
+        linkname="/home/authors/$author/public"
+        destination="$allBlogsDir/$author"
+        ln -s "$linkname" "$destination"
     done
 
     chown -R "$user:$user" "$allBlogsDir"
