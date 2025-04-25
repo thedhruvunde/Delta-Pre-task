@@ -35,11 +35,10 @@ get_usernames() {
     yq ".${1}[].username" "$CONFIG_FILE" | sort -u
 }
 
-
-
 get_authors() {
     yq '.mods[] | select(.username == "'"$1"'") | .authors[]' users.yaml
 }
+
 echo "Processing Admins..."
 get_usernames "admins" | while read -r username; do
     home="/home/admin/$username"
@@ -52,7 +51,6 @@ get_usernames "users" | while read -r username; do
     create_user "$username" "$home" "g_user"
     mkdir -p "/home/users/$username/all_blogs"
 done
-
 
 echo "Processing Authors..."
 get_usernames "authors" | while read -r username; do
@@ -79,7 +77,6 @@ echo "Processing User permissions..."
 get_usernames "users" | while read -r username; do
     home="/home/users/$username"
     chmod 700 $home
-    
 done
 
 echo "Processing admin permissions..."
@@ -99,29 +96,24 @@ get_usernames "mods" | while read -r modid; do
         chmod 770 "/home/authors/$authorid"
         mkdir -p "/home/mods/$modid/AuthorDirs/$authorid"
         ln -s "/home/authors/$authorid" "/home/mods/$modid/AuthorDirs/$authorid"
-    done 
+    done
 done
 
 
 echo "Creating all_blogs symlinks for users..."
-authors=$(yq '.authors[].username' "$CONFIG_FILE")
-
+authors=$(get_usernames "authors")
 get_usernames "users" | while read -r user; do
     allBlogsDir="/home/users/$user/all_blogs"
     mkdir -p "$allBlogsDir"
-
     for author in $authors; do
         target="/home/authors/$author/public"
         linkname="$allBlogsDir/$author"
         ln -s "$target" "$linkname"
     done
-
     chmod 500 "$allBlogsDir"
     chmod -R 500 "$allBlogsDir"/*
     echo "All blog links created for user: $user"
 done
-
-
 getExistingUsersInGroup() {
     getent group "$1" | cut -d: -f4 | tr ',' '\n' | sort -u
 }
@@ -147,10 +139,7 @@ syncUsersInGroup "authors" "g_author"
 syncUsersInGroup "mods" "g_mod"
 syncUsersInGroup "admins" "g_admin"
 
-
 echo "Updating moderators' author access..."
-
-
 get_usernames "mods" | while read -r mod; do
     echo "Resetting author groups for moderator: $mod"
     current_groups=$(id -nG "$mod")

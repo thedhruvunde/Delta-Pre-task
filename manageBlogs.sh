@@ -16,9 +16,14 @@ while getopts "p:a:d:e:" opt; do
         ;;
     a)
         a_flag=$OPTARG
+        echo "Archiving blog..."
+        rm "~/public/$a_flag"
         ;;
     d)
         d_flag=$OPTARG
+        echo "Deleting blog..."
+        rm "~/public/$d_flag"
+        rm "~/blogs/$d_flag"
         ;;
     e)
         e_flag=$OPTARG
