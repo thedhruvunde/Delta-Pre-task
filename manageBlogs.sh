@@ -4,7 +4,11 @@ a_flag=""
 d_flag=""
 e_flag=""
 catl=""
+BLOG_CONFIG="/scripts/blogs.yaml"
 
+get_categories() {
+    yq "[].categories" "$BLOG_CONFIG" | sort -u
+}
 while getopts "p:a:d:e:" opt; do
   case $opt in
     p)
@@ -27,6 +31,11 @@ while getopts "p:a:d:e:" opt; do
         ;;
     e)
         e_flag=$OPTARG
+        echo "Enter the order of categories"
+        i=1
+        get_categories | while read -r category; do
+            echo "$i -> $category"
+            i=i+1
         ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
