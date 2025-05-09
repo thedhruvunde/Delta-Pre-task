@@ -6,7 +6,7 @@ while getopts "p:" opt; do
         filename=$OPTARG
         lineNumber=1
         bWords=0
-        while IFS= read -r line; do
+        while IFS=$(read -r line); do
             echo "$lineNumber: $line"
             ((lineNumber++))
         done < "$filename"
