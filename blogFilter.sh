@@ -1,6 +1,6 @@
 #!/bin/bash
 
-while getopts "p:" opt; do
+while getopts "f:" opt; do
   case $opt in
     f)
         filename=$OPTARG
