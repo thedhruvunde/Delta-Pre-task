@@ -25,7 +25,7 @@ while getopts "p:a:d:e:" opt; do
         a_flag=$OPTARG
         echo "Archiving blog..."
         rm "$HOME/public/$a_flag"
-        bindex="yq '.blogs | to_entries | map(select(.value.file_name == "blog.txt")) | .[0].key' blogs.yaml"
+        bindex="yq '.blogs | to_entries | map(select(.value.file_name == "$a_flag")) | .[0].key' blogs.yaml"
         yq -i '.blogs[$bindex].publish_status = false' blogs.yaml
         ;;
     d)
@@ -33,7 +33,7 @@ while getopts "p:a:d:e:" opt; do
         echo "Deleting blog..."
         rm "$HOME/public/$d_flag"
         rm "$HOME/blogs/$d_flag"
-        bindex="yq '.blogs | to_entries | map(select(.value.file_name == "blog.txt")) | .[0].key' blogs.yaml"
+        bindex="yq '.blogs | to_entries | map(select(.value.file_name == "$d_flag")) | .[0].key' blogs.yaml"
         yq -i 'del(.blogs[$bindex])' blogs.yaml
         ;;
     e)
@@ -45,7 +45,7 @@ while getopts "p:a:d:e:" opt; do
             ((i++))
         done
         read cats
-        bindex="yq '.blogs | to_entries | map(select(.value.file_name == "blog.txt")) | .[0].key' blogs.yaml"
+        bindex="yq '.blogs | to_entries | map(select(.value.file_name == "$e_flag")) | .[0].key' blogs.yaml"
         yq -i '.blogs[$bindex].cat_order = $cats' blogs.yaml
         ;;
     \?)
