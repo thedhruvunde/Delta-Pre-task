@@ -6,10 +6,10 @@ while getopts "p:" opt; do
         filename=$OPTARG
         lineNumber=1
         bWords=0
-        while IFS=$(read -r line); do
+        cat $filename | while read -r line; do
             echo "$lineNumber: $line"
             ((lineNumber++))
-        done < "$filename"
+        done
         ;;
     \?)
         echo "Invalid option: -$OPTARG" >&2
