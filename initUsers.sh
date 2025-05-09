@@ -85,6 +85,7 @@ get_usernames "mods" | while read -r modid; do
         chown $authorid:$authorid "/home/authors/$authorid"
         chmod 770 "/home/authors/$authorid"
         mkdir -p "/home/mods/$modid/AuthorDirs/$authorid"
+        cp "/scripts/blacklist.txt" "$home"
         ln -s "/home/authors/$authorid" "/home/mods/$modid/AuthorDirs/$authorid"
     done
 done
